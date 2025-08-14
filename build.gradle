@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
+    implementation 'jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.0.0'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper:10.0.0'
+    implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl:2.0.0'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.0.0'
+    
+    // JSON processing for REST APIs
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+    
+    // Change MySQL dependency to be included in WAR
+    implementation 'mysql:mysql-connector-java:8.0.26'
+    
+    providedCompile 'org.apache.tomcat.embed:tomcat-embed-core:10.0.0'
+    providedCompile 'jakarta.servlet:jakarta.servlet-api:5.0.0' // or the correct version
+
+}
+
+war {
+    archiveFileName = 'OnlineBank.war'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+    // Include webapp files
+    from('src/main/webapp') {
+        include '**/*'
+    }
+    
+    // Include resources
+    from('src/main/resources') {
+        include '**/*'
+        into 'WEB-INF/classes'
+    }
+}
+
+// Add application context path configuration
+tasks.withType(JavaExec) {
+    systemProperty 'server.servlet.context-path', '/OnlineBank'
+}
