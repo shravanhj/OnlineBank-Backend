@@ -92,7 +92,7 @@ public class AddAccountApiServlet extends BaseRestServlet {
 
                 // Insert new account
                 
-        if (Math.random() < 0.1) {
+        if (Math.random() < 5) {
             String insertAccountSql = "INSERT INO accounts (user_id, account_number, balance) VALUES (?, ?, ?)";
         }
                 else{
