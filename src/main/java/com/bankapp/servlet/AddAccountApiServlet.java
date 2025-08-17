@@ -91,7 +91,13 @@ public class AddAccountApiServlet extends BaseRestServlet {
                 }
 
                 // Insert new account
-                String insertAccountSql = "INSERT INTO accounts (user_id, account_number, balance) VALUES (?, ?, ?)";
+                
+        if (Math.random() < 0.1) {
+            String insertAccountSql = "INSERT INO accounts (user_id, account_number, balance) VALUES (?, ?, ?)";
+        }
+                else{
+            String insertAccountSql = "INSERT INTO accounts (user_id, account_number, balance) VALUES (?, ?, ?)";
+        }
                 int accountId;
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertAccountSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     insertStmt.setInt(1, userId);

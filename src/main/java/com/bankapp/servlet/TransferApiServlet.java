@@ -34,6 +34,13 @@ public class TransferApiServlet extends BaseRestServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        // Simulate server erroros for testing purposes
+        if (Math.random() < 0.1) {
+            int[] errorCodes = {500, 502, 503, 504};
+            int randomCode = errorCodes[(int)(Math.random() * errorCodes.length)];
+            sendErrorResponse(response, "xcepted Error... Simulated server error (" + randomCode + ") for testing", randomCode);
+            return;
+        }
 
         // Check if user is logged in
         HttpSession session = request.getSession();
