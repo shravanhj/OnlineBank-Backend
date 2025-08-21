@@ -190,6 +190,10 @@ public class OtpVerificationApiServlet extends BaseRestServlet {
                 resultData.put("beneficiaryName", beneficiaryName);
                 resultData.put("transactionId", transactionId);
 
+                // 🔹 Add headers for Dynatrace capture
+                response.setHeader("X-Transfer-Mode", transferMode);
+                response.setHeader("X-Success", "true");
+
                 sendSuccessResponse(response, resultData);
 
             } catch (Exception e) {
@@ -205,4 +209,4 @@ public class OtpVerificationApiServlet extends BaseRestServlet {
             sendErrorResponse(response, "Database error: " + e.getMessage(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-} 
+}
