@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Account - Online Bank</title>
+
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="dashboard.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                                        <a class="dropdown-item" href="#" onclick="logout()"> <i class="fas fa-sign-out"></i>Logout</a>
+
+                    <li class="nav-item ms-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> <span id="user-name">User</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="dashboard.html">Online Bank</a></li>
+                                <li><a class="dropdown-item" href="accounts.html">My Accounts</a></li>
+                                <li><a class="dropdown-item" href="transfer.html">Transfer Money</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Add New Account</h2>
+                        <a href="dashboard.html" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="form-container">
+                        <div id="add-account-alert"></div>
+                        <form id="add-account-form">
+                            <div class="mb-3">
+                                <label for="accountNumber" class="form-label">Account Number(10-16)Digits.</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
+                                    <input type="text" class="form-control" id="accountNumber" name="accountNumber" 
+                                           placeholder="Enter account number (10-16 digits)">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="initialBalance" class="form-label">Initial Balance (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                    <input type="number" class="form-control" id="initialBalance" name="initialBalance" 
+                                           step="0.01" min="0"
+                                           placeholder="Enter initial balance">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Add Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = sessionStorage.getItem('userData');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const user = JSON.parse(userData);
+            document.getElementById('user-name').textContent = user.userName;
+
+            document.getElementById('add-account-form').addEventListener('submit', handleAddAccount);
+        });
+    </script>
+</body>
+</html>

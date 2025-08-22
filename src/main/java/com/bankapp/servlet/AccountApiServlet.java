@@ -2,7 +2,6 @@ package com.bankapp.servlet;
 
 import com.bankapp.dao.Database;
 import com.bankapp.model.Account;
-import com.bankapp.model.Transaction;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,24 +19,20 @@ import java.util.Map;
 
 /**
  * AccountApiServlet handles account-related operations.
- * It allows users to view their accounts, add new accounts, and retrieve account details.
- * It also checks if the user is authenticated before allowing access to account operations.
- * @author  Shravan HJ
- * @email   shravanhj@gmail.com
- * @version 1.0
- * @since   2025-05-14
+ * It allows users to view their accounts and other beneficiary accounts.
+ * Transactions are moved to TransactionApiServlet.
  */
-
 @WebServlet("/api/accounts")
 public class AccountApiServlet extends BaseRestServlet {
 
+    private static final int DEFAULT_PAGE_SIZE = 2000; // number of accounts per page
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
 
-        // Check if user is logged in
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
         String phoneNumber = (String) session.getAttribute("phoneNumber");
@@ -47,37 +42,54 @@ public class AccountApiServlet extends BaseRestServlet {
             return;
         }
 
+        // Read pagination parameters
+        int pageSize = DEFAULT_PAGE_SIZE;
+        int page = 0;
+        String pageParam = request.getParameter("page");
+        String sizeParam = request.getParameter("size");
+        try {
+            if (pageParam != null) page = Integer.parseInt(pageParam);
+            if (sizeParam != null) pageSize = Integer.parseInt(sizeParam);
+        } catch (NumberFormatException ignored) {}
+
+        int offset = page * pageSize;
+
         try (Connection conn = Database.getConnection()) {
             List<Account> userAccounts = new ArrayList<>();
             List<Account> allAccounts = new ArrayList<>();
-            List<Transaction> transactions = new ArrayList<>();
 
-            // Query for user's accounts
-            String userAccountsSql = "SELECT a.* FROM accounts a JOIN users u ON a.user_id = u.user_id WHERE u.phone_number = ?";
-            try (PreparedStatement accountStmt = conn.prepareStatement(userAccountsSql)) {
-                accountStmt.setString(1, phoneNumber);
-                try (ResultSet accountRs = accountStmt.executeQuery()) {
-                    while (accountRs.next()) {
-                        int accountId = accountRs.getInt("account_id");
-                        String accountNumber = accountRs.getString("account_number");
-                        double balance = accountRs.getDouble("balance");
+            // User's accounts with pagination
+            String userAccountsSql = "SELECT a.* FROM accounts a JOIN users u ON a.user_id = u.user_id " +
+                                     "WHERE u.phone_number = ? LIMIT ? OFFSET ?";
+            try (PreparedStatement stmt = conn.prepareStatement(userAccountsSql)) {
+                stmt.setString(1, phoneNumber);
+                stmt.setInt(2, pageSize);
+                stmt.setInt(3, offset);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        int accountId = rs.getInt("account_id");
+                        String accountNumber = rs.getString("account_number");
+                        double balance = rs.getDouble("balance");
                         userAccounts.add(new Account(accountId, accountNumber, balance));
                     }
                 }
             }
 
-            // Query for all other accounts (excluding user's own accounts)
-            String allAccountsSql = "SELECT a.*, u.name as beneficiary_name FROM accounts a " +
-                                  "JOIN users u ON a.user_id = u.user_id " +
-                                  "WHERE a.user_id != (SELECT user_id FROM users WHERE phone_number = ?)";
-            try (PreparedStatement allAccountsStmt = conn.prepareStatement(allAccountsSql)) {
-                allAccountsStmt.setString(1, phoneNumber);
-                try (ResultSet allAccountsRs = allAccountsStmt.executeQuery()) {
-                    while (allAccountsRs.next()) {
-                        int accountId = allAccountsRs.getInt("account_id");
-                        String accountNumber = allAccountsRs.getString("account_number");
-                        double balance = allAccountsRs.getDouble("balance");
-                        String beneficiaryName = allAccountsRs.getString("beneficiary_name");
+            // All other accounts with pagination
+            String allAccountsSql = "SELECT a.*, u.name AS beneficiary_name FROM accounts a " +
+                                    "JOIN users u ON a.user_id = u.user_id " +
+                                    "WHERE a.user_id != (SELECT user_id FROM users WHERE phone_number = ?) " +
+                                    "LIMIT ? OFFSET ?";
+            try (PreparedStatement stmt = conn.prepareStatement(allAccountsSql)) {
+                stmt.setString(1, phoneNumber);
+                stmt.setInt(2, pageSize);
+                stmt.setInt(3, offset);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        int accountId = rs.getInt("account_id");
+                        String accountNumber = rs.getString("account_number");
+                        double balance = rs.getDouble("balance");
+                        String beneficiaryName = rs.getString("beneficiary_name");
                         Account account = new Account(accountId, accountNumber, balance);
                         account.setBeneficiaryName(beneficiaryName);
                         allAccounts.add(account);
@@ -85,45 +97,14 @@ public class AccountApiServlet extends BaseRestServlet {
                 }
             }
 
-            // Query for transaction history (added transfer_mode)
-            String transactionSql = "SELECT t.transaction_id, t.amount, t.transaction_date, t.transaction_type, t.status, " +
-                                    "t.from_account_id, t.to_account_id, t.otp, t.transfer_mode " +
-                                    "FROM transactions t " +
-                                    "WHERE t.user_id = ? " +
-                                    "ORDER BY t.transaction_date DESC";
+            // Determine if there is a next page
+            boolean hasNextPage = (userAccounts.size() == pageSize || allAccounts.size() == pageSize);
 
-            try (PreparedStatement transactionStmt = conn.prepareStatement(transactionSql)) {
-                transactionStmt.setInt(1, userId);
-                try (ResultSet transactionRs = transactionStmt.executeQuery()) {
-                    while (transactionRs.next()) {
-                        int transactionId = transactionRs.getInt("transaction_id");
-                        double amount = transactionRs.getDouble("amount");
-                        java.sql.Timestamp date = transactionRs.getTimestamp("transaction_date");
-                        String type = transactionRs.getString("transaction_type");
-                        String status = transactionRs.getString("status");
-                        int fromAccountId = transactionRs.getInt("from_account_id");
-                        int toAccountId = transactionRs.getInt("to_account_id");
-                        String otp = transactionRs.getString("otp");
-                        String transferMode = transactionRs.getString("transfer_mode");
-
-                        Transaction transaction = new Transaction(transactionId, amount, date, type);
-                        transaction.setStatus(status);
-                        transaction.setOtp(otp);
-                        transaction.setFromAccountId(fromAccountId);
-                        transaction.setToAccountId(toAccountId);
-                        transaction.setTransferMode(transferMode); // <-- added
-
-                        transactions.add(transaction);
-                    }
-                }
-            }
-
-            // Prepare response data
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("accounts", userAccounts);
             responseData.put("allAccounts", allAccounts);
-            responseData.put("transactions", transactions);
             responseData.put("userId", userId);
+            responseData.put("nextPage", hasNextPage ? page + 1 : null);
 
             sendSuccessResponse(response, responseData);
 
@@ -133,3 +114,4 @@ public class AccountApiServlet extends BaseRestServlet {
         }
     }
 }
+

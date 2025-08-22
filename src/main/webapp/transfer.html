@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Funds - Online Bank</title>
+
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* Style for searchable list */
+        #toAccountList .account-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="dashboard.html">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item ms-2">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> <span id="user-name">User</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="dashboard.html">Online Bank</a></li>
+                                <li><a class="dropdown-item" href="accounts.html">My Accounts</a></li>
+                                <li><a class="dropdown-item" href="transfer.html">Transfer Money</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Fund Transfer</h2>
+                        <a href="dashboard.html" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="form-container">
+                        <div id="transfer-alert"></div>
+                        <form id="transfer-form">
+                            <div class="mb-3">
+                                <label for="fromAccount" class="form-label">From Account</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-wallet"></i></span>
+                                    <select class="form-select" id="fromAccount" name="fromAccountId" required>
+                                        <option value="">Select your account</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="toAccountSearch" class="form-label">To Account</label>
+                                <input type="text" class="form-control" id="toAccountSearch" placeholder="Search Beneficiary Account" autocomplete="off">
+                                <div id="toAccountList" class="border rounded mt-1" style="max-height: 200px; overflow-y: auto;"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Transfer Mode</label>
+                                <div class="row g-3">
+                                    <div class="col-sm-6 col-md-4">
+                                        <div class="form-check border rounded shadow-sm p-3 h-100">
+                                            <input class="form-check-input mb-2" type="radio" name="transferMode" id="neft" value="NEFT" checked>
+                                            <label class="form-check-label" for="neft">
+                                                <strong>NEFT</strong> – <small class="text-muted">Settled in batches, available 24/7</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4">
+                                        <div class="form-check border rounded shadow-sm p-3 h-100">
+                                            <input class="form-check-input mb-2" type="radio" name="transferMode" id="rtgs" value="RTGS">
+                                            <label class="form-check-label" for="rtgs">
+                                                <strong>RTGS</strong> – <small class="text-muted">Real-time settlement, minimum ₹2 lakhs</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4">
+                                        <div class="form-check border rounded shadow-sm p-3 h-100">
+                                            <input class="form-check-input mb-2" type="radio" name="transferMode" id="imps" value="IMPS">
+                                            <label class="form-check-label" for="imps">
+                                                <strong>IMPS</strong> – <small class="text-muted">Instant transfer, available 24/7</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                    <input type="number" class="form-control" id="amount" name="amount" 
+                                           step="0.01" min="0.01" required 
+                                           placeholder="Enter amount in Indian Rupees">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Verify & Complete Transfer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        // -------------------------------
+        // Batched rendering and searchable To Account
+        // -------------------------------
+        let allAccounts = [];
+        let filteredAccounts = [];
+
+        async function loadTransferAccounts() {
+            const fromSelect = document.getElementById('fromAccount');
+            const result = await apiCall('/accounts'); // your existing API call
+
+            if (result.success) {
+                const userAccounts = result.data.accounts || [];
+                allAccounts = result.data.allAccounts || [];
+
+                // Populate From Account dropdown
+                fromSelect.innerHTML = '<option value="">Select your account</option>';
+                userAccounts.forEach(acc => {
+                    const opt = document.createElement('option');
+                    opt.value = acc.accountId;
+                    opt.textContent = `${acc.accountNumber} - ₹${Number(acc.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                    fromSelect.add(opt);
+                });
+
+                // Initial render of To Account list (first 100)
+                renderAccountList(allAccounts);
+            } else {
+                console.error('Failed to load accounts:', result.error);
+            }
+        }
+
+        function renderAccountList(accounts, containerId='toAccountList', batchSize=100) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            let i = 0;
+
+            function batch() {
+                const end = Math.min(i + batchSize, accounts.length);
+                for (; i < end; i++) {
+                    const acc = accounts[i];
+                    const div = document.createElement('div');
+                    div.className = 'account-item p-2 border-bottom';
+                    div.style.cursor = 'pointer';
+                    div.textContent = `${acc.accountNumber} - ${acc.beneficiaryName || ''} (₹${Number(acc.balance).toLocaleString('en-IN', { minimumFractionDigits: 2 })})`;
+                    div.dataset.accountId = acc.accountId;
+                    div.addEventListener('click', () => {
+                        document.getElementById('toAccountSearch').value = div.textContent;
+                        document.getElementById('toAccountSearch').dataset.selectedId = acc.accountId;
+                        container.style.display = 'none';
+                    });
+                    container.appendChild(div);
+                }
+                if (i < accounts.length) requestAnimationFrame(batch);
+            }
+            batch();
+            container.style.display = 'block';
+        }
+
+        document.getElementById('toAccountSearch').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            filteredAccounts = allAccounts.filter(acc =>
+                acc.accountNumber.toLowerCase().includes(query) ||
+                (acc.beneficiaryName && acc.beneficiaryName.toLowerCase().includes(query))
+            );
+            renderAccountList(filteredAccounts);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('toAccountList').contains(e.target) &&
+                e.target.id !== 'toAccountSearch') {
+                document.getElementById('toAccountList').style.display = 'none';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = sessionStorage.getItem('userData');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(userData);
+            document.getElementById('user-name').textContent = user.userName;
+
+            // Load accounts
+            loadTransferAccounts();
+
+            // Form submission
+            document.getElementById('transfer-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const fromAccountId = document.getElementById('fromAccount').value;
+                const toAccountId = document.getElementById('toAccountSearch').dataset.selectedId;
+                if (!toAccountId) {
+                    alert('Please select a beneficiary account.');
+                    return;
+                }
+                handleTransfer(); // your existing transfer handler
+            });
+        });
+    </script>
+</body>
+</html>

@@ -190,7 +190,6 @@ public class OtpVerificationApiServlet extends BaseRestServlet {
                 resultData.put("beneficiaryName", beneficiaryName);
                 resultData.put("transactionId", transactionId);
 
-                // 🔹 Add headers for Dynatrace capture
                 response.setHeader("X-Transfer-Mode", transferMode);
                 response.setHeader("X-Success", "true");
 
