@@ -1,0 +1,320 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Button Styles */
+.btn-custom {
+    border-radius: 30px;
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-login {
+    background-color: #fd7e14;
+    color: #fff;
+    border: none;
+}
+
+.btn-login:hover {
+    background-color: #e36f11;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    background-color: transparent;
+    color: #fd7e14;
+    border: 1px solid #fd7e14;
+}
+
+.btn-register:hover {
+    background-color: #fd7e14;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 4rem 0 2rem;
+    text-align: center;
+}
+
+.hero-section h1 {
+    color: #2c3e50;
+}
+
+/* Feature Cards */
+.feature-card {
+    background-color: #fff;
+    border: none;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    height: 100%;
+}
+
+.feature-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: #fd7e14;
+    margin-bottom: 1rem;
+}
+
+/* Form Styles */
+.form-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.form-control {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #fd7e14;
+    box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25);
+}
+
+.form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #fd7e14;
+    box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-right: none;
+    border-radius: 0.5rem 0 0 0.5rem;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.input-group .form-select {
+    border-left: none;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Dashboard Styles */
+.dashboard-card {
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.balance-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* soft shadow */
+    border: 1px solid #f1f1f1; /* subtle border */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.balance-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* lift effect */
+}
+
+.balance-amount {
+    color: #fd7e14;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0.25rem 0;
+}
+
+
+
+/* Transaction Styles */
+.transaction-item {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #fd7e14;
+    transition: 0.3s;
+}
+
+.transaction-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.transaction-credit {
+    border-left-color: #198754;
+}
+
+.transaction-debit {
+    border-left-color: #dc3545;
+}
+
+/* Transaction Details Styles */
+.transaction-details {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #212529;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Footer */
+footer {
+    background-color: #f1f1f1;
+    font-size: 0.9rem;
+    padding: 1rem 0;
+    text-align: center;
+    color: #6c757d;
+    margin-top: 3rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 0 1rem;
+    }
+    
+    .form-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .balance-amount {
+        font-size: 2rem;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Transfer Mode Options */
+.transfer-mode-options {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.form-check {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+}
+
+.form-check:last-child {
+    margin-bottom: 0;
+}
+
+.form-check-input {
+    margin-top: 0.25rem;
+}
+
+.form-check-label {
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.form-check-label strong {
+    color: #fd7e14;
+}
+
+/* Utility Classes */
+.text-primary {
+    color: #fd7e14 !important;
+}
+
+.bg-primary {
+    background-color: #fd7e14 !important;
+}
+
+.border-primary {
+    border-color: #fd7e14 !important;
+}
