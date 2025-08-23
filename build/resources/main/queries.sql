@@ -1,3 +1,11 @@
+
+/**
+    * This file contains SQL queries for the Online Bank application.
+ * @author  Shravan HJ
+ * @email   shravanhj@gmail.com
+ * @version 1.0
+ * @since   2025-05-14
+ */
 -- User Registration
 INSERT INTO users (name, phone_number, password) VALUES (?, ?, ?);
 

@@ -1,3 +1,11 @@
+/**
+ * This file contains the SQL schema for the Online Bank application.
+ * @author  Shravan HJ
+ * @email   shravanhj@gmail.com
+ * @version 1.0
+ * @since   2025-05-14
+ */
+
 -- Create database if not exists
 CREATE DATABASE IF NOT EXISTS onlinebank_java;
 USE onlinebank_java;
